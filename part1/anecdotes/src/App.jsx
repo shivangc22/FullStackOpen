@@ -12,17 +12,38 @@ const App = () => {
     'The only way to go fast, is to go well.'
   ]
 
-  const onNextClick = () => {
-    let randomIndex = Math.floor(Math.random() * anecdotes.length)
-    setSelected(randomIndex)
+  const initialVotes = {
+    0: 0,
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+    6: 0,
+    7: 0
   }
    
   const [selected, setSelected] = useState(0)
+  const [votes, setVote] = useState(initialVotes)
+
+  const onNextClick = () => {
+    const randomIndex = Math.floor(Math.random() * anecdotes.length)
+    setSelected(randomIndex)
+  }
+
+  const onVoteClick = () => {
+    const updatedVotes = { ...votes}
+    updatedVotes[selected] += 1
+    setVote(updatedVotes)
+    console.log(updatedVotes)
+  }
 
   return (
     <div>
-      {anecdotes[selected]}
-      <p><Button onClick = {onNextClick} label = 'Next' /></p>
+      <em>{anecdotes[selected]}</em><br />
+      <p>This has {votes[selected]} votes!</p><br />
+      <Button onClick = {onNextClick} label = 'Next' />
+      <Button onClick = {onVoteClick} label = 'Vote' />
     </div>
   )
 }

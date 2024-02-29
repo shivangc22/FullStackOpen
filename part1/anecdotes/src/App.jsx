@@ -40,14 +40,41 @@ const App = () => {
 
   return (
     <div>
-      <em>{anecdotes[selected]}</em><br />
-      <p>This has {votes[selected]} votes!</p><br />
+      <h1>{anecdotes[selected]}</h1>
+      <p>This has {votes[selected]} votes!</p>
       <Button onClick = {onNextClick} label = 'Next' />
-      <Button onClick = {onVoteClick} label = 'Vote' />
+      <Button onClick = {onVoteClick} label = 'Vote' /><br />
+      <HighestAnecdote anecdotesList={anecdotes} voteList={votes} />
     </div>
   )
 }
 
 const Button = ({onClick, label}) => <button onClick = {onClick}>{label}</button>
 
+const HighestAnecdote = ({anecdotesList, voteList}) => {
+  const maxVotes = Math.max(...Object.values(voteList))
+  if(maxVotes === 0) {
+    return <p>No anecdote has been voted for!</p>
+  }
+  const maxVotesIndices = Object.keys(voteList).filter(index => voteList[index] === maxVotes)
+  if(maxVotesIndices.length === 1) {
+    return(
+      <>
+        <p>The highest voted anecdote, with {maxVotes} votes is: </p>
+        <h1>{anecdotesList[maxVotesIndices[0]]}</h1>
+      </>
+    )
+  } else {
+    return(
+      <>
+        <p>The highest voted anecdotes, with {maxVotes} votes each, are: </p>
+        {maxVotesIndices.map(index => (
+          <div key = {index}>
+            <h1>{anecdotesList[index]}</h1>
+          </div>
+        ))}
+      </>
+    )
+  }
+}
 export default App

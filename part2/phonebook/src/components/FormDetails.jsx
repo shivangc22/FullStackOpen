@@ -2,7 +2,7 @@
 import phonebook from "../services/phonebook";
 import { useState } from "react";
 
-const FormDetails = ({ persons, setPersons, setNewSearch }) => {
+const FormDetails = ({ persons, setPersons, setNewSearch, setErrorMessage }) => {
     const [newName, setNewName] = useState('');
     const [newNumber, setNewNumber] = useState('');
 
@@ -18,7 +18,7 @@ const FormDetails = ({ persons, setPersons, setNewSearch }) => {
           if (window.confirm(confirmMessage)) {
               const newObject = { name: newName, number: newNumber };
               try {
-                  const updatedEntry = await phonebook.updateEntry(existingPerson.id, newObject);
+                  const updatedEntry = await phonebook.updateEntry(existingPerson.id, newObject)
                   const updatedPersons = persons.map(person =>
                       person.id === updatedEntry.id ? updatedEntry : person
                   );
@@ -26,9 +26,15 @@ const FormDetails = ({ persons, setPersons, setNewSearch }) => {
                   setNewName('');
                   setNewNumber('');
                   setNewSearch('');
-                  alert(`Successfully updated ${existingPerson.name} in the phonebook!`);
+                  setErrorMessage(`Successfully updated ${existingPerson.name} in the phonebook!`)
+                  setTimeout(() => {
+                    setErrorMessage(null)
+                  }, 5000)
               } catch (error) {
-                  console.error("Error updating person:", error.message);
+                setErrorMessage(`Failed to update ${existingPerson.name}!`)
+                setTimeout(() => {
+                    setErrorMessage(null)
+                }, 5000)
               }
           }
       } else {
@@ -39,8 +45,15 @@ const FormDetails = ({ persons, setPersons, setNewSearch }) => {
               setNewName('');
               setNewNumber('');
               setNewSearch('');
+              setErrorMessage(`Successfully added ${newName} to the phonebook!`)
+              setTimeout(() => {
+                setErrorMessage(null)
+              }, 5000)
           } catch (error) {
-              console.error("Error adding new person:", error.message);
+            setErrorMessage(`Failed to add ${newName}!`)
+            setTimeout(() => {
+                setErrorMessage(null)
+            }, 5000)
           }
       }
   };

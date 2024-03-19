@@ -62,6 +62,7 @@ const FormDetails = ({persons, setPersons}) => {
           setPersons(persons.concat(returnedEntry));
           setNewName('');
           setNewNumber('');
+          setNewSearch('');
         })
     }
   };
@@ -81,4 +82,5 @@ const FormDetails = ({persons, setPersons}) => {
 const ShowEntries = ({filteredResults}) => <ol> { filteredResults.map(element => <li key = {element.id}><ShowData name = {element.name} number = {element.number} /></li>)} </ol>
 
 const ShowData = ({name, number}) => <p>{name}: {number}</p>
+
 export default App

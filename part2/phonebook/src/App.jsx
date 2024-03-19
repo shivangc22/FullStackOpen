@@ -1,19 +1,18 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import phonebook from './services/phonebook'
 
 const App = () => {
   
   const [persons, setPersons] = useState([])
-
   const [newSearch, setNewSearch] = useState('')
 
   const handleSearchFilter = (event) => setNewSearch(event.target.value.toLowerCase())
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
+    phonebook
+      .getAll()
+      .then(initialEntries => {
+        setPersons(initialEntries)
       })
   }, [])
 
@@ -56,10 +55,14 @@ const FormDetails = ({persons, setPersons}) => {
         alert(`${newNumber} is already added to the phonebook, with the name ${existingEntry.name}`);
       }
     } else {
-      const newObject = { id: persons.length + 1, name: newName, number: newNumber };
-      setPersons(persons.concat(newObject));
-      setNewName('');
-      setNewNumber('');
+      const newObject = { name: newName, number: newNumber };
+      phonebook
+        .create(newObject)
+        .then(returnedEntry => {
+          setPersons(persons.concat(returnedEntry));
+          setNewName('');
+          setNewNumber('');
+        })
     }
   };
   return(

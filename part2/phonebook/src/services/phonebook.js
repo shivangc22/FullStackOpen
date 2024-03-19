@@ -1,28 +1,39 @@
-import axios from 'axios'
+// phonebook.js
+import axios from 'axios';
 
-const baseURL = 'http://localhost:3001/persons'
+const baseURL = 'http://localhost:3001/persons';
+
+const phonebookRequest = async (method, url, data = null) => {
+    try {
+        const response = await axios.request({
+            method,
+            url: `${baseURL}/${url}`,
+            data
+        });
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response.data.error);
+    }
+};
 
 const getAll = async () => {
-    const response = await axios.get(baseURL)
-    return response.data
-}
+    return phonebookRequest('GET', '');
+};
 
-const create = async newObject => {
-    const request = axios.post(baseURL, newObject)
-    const response = await request
-    return response.data
-}
+const create = async (newObject) => {
+    return phonebookRequest('POST', '', newObject);
+};
 
 const update = async (id, newObject) => {
-    const request = axios.put(`${baseURL}/${id}`, newObject)
-    const response = await request
-    return response.data
-}
+    return phonebookRequest('PUT', id, newObject);
+};
 
 const deleteEntry = async (id) => {
-    const request = axios.delete(`${baseURL}/${id}`)
-    const response = await request
-    return response.data
-}
+    return phonebookRequest('DELETE', id);
+};
 
-export default { getAll, create, update, deleteEntry }
+const updateEntry = async (id, newObject) => {
+    return phonebookRequest('PUT', id, newObject);
+};
+
+export default { getAll, create, update, deleteEntry, updateEntry };

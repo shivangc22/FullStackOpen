@@ -1,45 +1,62 @@
-import phonebook from "../services/phonebook"
-import { useState } from "react"
+// FormDetails.jsx
+import phonebook from "../services/phonebook";
+import { useState } from "react";
 
-const FormDetails = ({persons, setPersons, setNewSearch}) => {
+const FormDetails = ({ persons, setPersons, setNewSearch }) => {
+    const [newName, setNewName] = useState('');
+    const [newNumber, setNewNumber] = useState('');
 
-    const [newName, setNewName] = useState('')
-    const [newNumber, setNewNumber] = useState('')
-    const handleNewName = (event) => setNewName(event.target.value)
-    const handleNewNumber = (event) => setNewNumber(event.target.value)
-  
-    const addNewEntry = (event) => {
+    const handleNewName = (event) => setNewName(event.target.value);
+    const handleNewNumber = (event) => setNewNumber(event.target.value);
+
+    const addNewEntry = async (event) => {
       event.preventDefault();
-      if (persons.some(obj => obj.name === newName || obj.number === newNumber)) {
-        const existingEntry = persons.find(person => person.name === newName || person.number === newNumber);
-        if (existingEntry.name === newName) {
-          alert(`${newName} is already added to the phonebook, with the number ${existingEntry.number}`);
-        } else {
-          alert(`${newNumber} is already added to the phonebook, with the name ${existingEntry.name}`);
-        }
+      const existingPerson = persons.find(person => person.name === newName || person.number === newNumber);
+  
+      if (existingPerson) {
+          const confirmMessage = `${existingPerson.name} is already added to the phonebook, with ${existingPerson.number}, overwrite?`;
+          if (window.confirm(confirmMessage)) {
+              const newObject = { name: newName, number: newNumber };
+              try {
+                  const updatedEntry = await phonebook.updateEntry(existingPerson.id, newObject);
+                  const updatedPersons = persons.map(person =>
+                      person.id === updatedEntry.id ? updatedEntry : person
+                  );
+                  setPersons(updatedPersons);
+                  setNewName('');
+                  setNewNumber('');
+                  setNewSearch('');
+                  alert(`Successfully updated ${existingPerson.name} in the phonebook!`);
+              } catch (error) {
+                  console.error("Error updating person:", error.message);
+              }
+          }
       } else {
-        const newObject = { name: newName, number: newNumber };
-        phonebook
-          .create(newObject)
-          .then(returnedEntry => {
-            setPersons(persons.concat(returnedEntry));
-            setNewName('');
-            setNewNumber('');
-            setNewSearch('');
-          })
+          const newObject = { name: newName, number: newNumber };
+          try {
+              const returnedEntry = await phonebook.create(newObject);
+              setPersons([...persons, returnedEntry]);
+              setNewName('');
+              setNewNumber('');
+              setNewSearch('');
+          } catch (error) {
+              console.error("Error adding new person:", error.message);
+          }
       }
-    };
-    return(
-      <form onSubmit = {addNewEntry}>
-        <div>
-          <p>name: <input value = {newName} onChange = {handleNewName}/></p>
-          <p>number: <input value = {newNumber} onChange = {handleNewNumber}/></p>
-        </div>
-        <div>
-          <br /><button type="submit">add</button>
-        </div>
-      </form>
-    )
-}
+  };
+  
 
-export default FormDetails
+    return (
+        <form onSubmit={addNewEntry}>
+            <div>
+                <p>name: <input value={newName} onChange={handleNewName} /></p>
+                <p>number: <input value={newNumber} onChange={handleNewNumber} /></p>
+            </div>
+            <div>
+                <br /><button type="submit">add</button>
+            </div>
+        </form>
+    );
+};
+
+export default FormDetails;
